@@ -69,7 +69,7 @@ def _call_with_resilience(
                         temperature=temperature,
                         response_mime_type="application/json",
                         response_schema=response_schema,
-                        thinking_config=types.ThinkingConfig(thinking_budget=0),
+                        
                     ),
                 )
                 return response.parsed, model_name
