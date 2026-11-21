@@ -134,11 +134,11 @@ export default function EvaluatedRagDashboard() {
   const scorePct = response ? Math.round(response.evaluation.faithfulness_score * 100) : 0;
 
   return (
-    // UNLOCKED LAYOUT: min-h-screen allows normal vertical page scrolling
-    <div className="flex min-h-screen flex-col bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white">
+    // STRICT EDGE-TO-EDGE LOCK (h-screen w-screen overflow-hidden)
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white">
       
-      {/* STICKY TOP NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 flex h-[60px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7]/90 px-4 backdrop-blur-md lg:px-6">
+      {/* COMPACT TOP NAVIGATION BAR */}
+      <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7] px-4 lg:px-6">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-[#007aff]" />
           <h1 className="text-base font-semibold tracking-wide text-[#1d1d1f]">
@@ -157,12 +157,11 @@ export default function EvaluatedRagDashboard() {
         </div>
       </header>
 
-      {/* MAIN WORKSPACE WRAPPER */}
-      <div className="flex flex-1 flex-col lg:flex-row">
+      {/* MAIN SPLIT-PANE WORKSPACE */}
+      <div className="flex flex-1 overflow-hidden">
         
-        {/* STICKY LEFT SIDEBAR */}
-        {/* On desktop, it sticks below the 60px header and spans the remaining viewport height */}
-        <aside className="z-40 flex w-full shrink-0 flex-col border-b border-black/5 bg-[#f5f5f7] lg:sticky lg:top-[60px] lg:h-[calc(100vh-60px)] lg:w-[420px] lg:border-b-0 lg:border-r shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
+        {/* LEFT SIDEBAR: KNOWLEDGE BASE */}
+        <aside className="flex w-[340px] shrink-0 flex-col border-r border-black/5 bg-[#f5f5f7] shadow-[1px_0_10px_rgba(0,0,0,0.02)] lg:w-[420px]">
           
           {/* Section 1: Upload */}
           <div className="border-b border-black/5 p-6">
@@ -242,11 +241,12 @@ export default function EvaluatedRagDashboard() {
           </div>
         </aside>
 
-        {/* RIGHT MAIN AREA (NATURAL SCROLL) */}
-        <main className="flex flex-1 flex-col bg-white">
+        {/* RIGHT MAIN AREA (FLEX-COL SIBLINGS = IMPOSSIBLE TO OVERLAP) */}
+        <main className="flex min-w-0 flex-1 flex-col bg-white">
           
-          <div className="mx-auto w-full max-w-5xl p-6 pb-48 lg:p-12">
-            <div className="space-y-8">
+          {/* 1. SCROLLABLE RESULTS AREA (Takes up remaining vertical space) */}
+          <div className="custom-scrollbar flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-5xl space-y-8 p-6 lg:p-12">
               
               {errorMsg && (
                 <div className="flex items-center gap-3 rounded-xl border border-[#ff3b30]/20 bg-[#ff3b30]/5 p-5 text-base font-medium text-[#ff3b30]">
@@ -374,53 +374,53 @@ export default function EvaluatedRagDashboard() {
               )}
             </div>
           </div>
+
+          {/* 2. STATIC COMMAND BAR (Anchored at bottom, never overlaps) */}
+          <div className="shrink-0 border-t border-black/5 bg-white p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] lg:p-8">
+            <div className="mx-auto max-w-5xl">
+              
+              {/* Sample Prompts */}
+              <div className="mb-4 hidden flex-wrap gap-3 md:flex">
+                {SAMPLE_PROMPTS.map((sample, idx) => (
+                  <button
+                    key={idx}
+                    disabled={!selectedDocId || querying}
+                    onClick={() => handleAsk(sample)}
+                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold text-[#8e8e93] shadow-sm transition-all hover:border-[#007aff] hover:text-[#007aff] disabled:pointer-events-none disabled:opacity-40"
+                  >
+                    {sample}
+                  </button>
+                ))}
+              </div>
+
+              {/* Main Input Form */}
+              <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className="relative flex items-center rounded-2xl shadow-xl">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={selectedDoc ? `Ask about "${selectedDoc.title}"...` : "Select a document first..."}
+                  disabled={!selectedDocId || querying}
+                  className="h-16 w-full rounded-2xl border-2 border-transparent bg-[#f5f5f7] pl-6 pr-36 text-lg font-semibold text-[#1d1d1f] shadow-inner transition-all placeholder:text-[#8e8e93] focus:border-[#007aff] focus:bg-white focus:outline-none disabled:opacity-60"
+                />
+                <div className="absolute right-3">
+                  <button
+                    type="submit"
+                    disabled={!selectedDocId || !query.trim() || querying}
+                    className="flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#007aff] px-6 text-base font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                  >
+                    {querying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                    <span className="hidden sm:inline">{querying ? "Auditing" : "Ask"}</span>
+                  </button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+
         </main>
       </div>
       
-      {/* FLOATING COMMAND BAR */}
-      {/* FIXED at the bottom, perfectly aligned over the main right area */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/5 bg-white/90 p-5 backdrop-blur-2xl lg:left-[420px] lg:p-8">
-        <div className="mx-auto max-w-5xl">
-          
-          {/* Sample Prompts */}
-          <div className="mb-4 hidden flex-wrap gap-3 md:flex">
-            {SAMPLE_PROMPTS.map((sample, idx) => (
-              <button
-                key={idx}
-                disabled={!selectedDocId || querying}
-                onClick={() => handleAsk(sample)}
-                className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold text-[#8e8e93] shadow-sm transition-all hover:border-[#007aff] hover:text-[#007aff] disabled:pointer-events-none disabled:opacity-40"
-              >
-                {sample}
-              </button>
-            ))}
-          </div>
-
-          {/* Main Input Form */}
-          <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className="relative flex items-center rounded-2xl shadow-xl">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={selectedDoc ? `Ask about "${selectedDoc.title}"...` : "Select a document first..."}
-              disabled={!selectedDocId || querying}
-              className="h-16 w-full rounded-2xl border-2 border-transparent bg-[#f5f5f7] pl-6 pr-36 text-lg font-semibold text-[#1d1d1f] shadow-inner transition-all placeholder:text-[#8e8e93] focus:border-[#007aff] focus:bg-white focus:outline-none disabled:opacity-60"
-            />
-            <div className="absolute right-3">
-              <button
-                type="submit"
-                disabled={!selectedDocId || !query.trim() || querying}
-                className="flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#007aff] px-6 text-base font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-              >
-                {querying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                <span className="hidden sm:inline">{querying ? "Auditing" : "Ask"}</span>
-              </button>
-            </div>
-          </form>
-
-        </div>
-      </div>
-
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
