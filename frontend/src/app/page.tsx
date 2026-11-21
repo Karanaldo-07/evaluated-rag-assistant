@@ -134,43 +134,44 @@ export default function EvaluatedRagDashboard() {
   const scorePct = response ? Math.round(response.evaluation.faithfulness_score * 100) : 0;
 
   return (
-    // STRICT EDGE-TO-EDGE LOCK (h-screen w-screen overflow-hidden)
+    // STRICT EDGE-TO-EDGE LOCK
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white">
       
       {/* COMPACT TOP NAVIGATION BAR */}
       <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7] px-4 lg:px-6">
         <div className="flex items-center gap-3">
-          <ShieldCheck className="h-6 w-6 text-[#007aff]" />
+          <ShieldCheck className="h-6 w-6 shrink-0 text-[#007aff]" />
           <h1 className="text-base font-semibold tracking-wide text-[#1d1d1f]">
-            VeriRAG <span className="font-normal text-[#8e8e93]">Evaluated Document Assistant</span>
+            VeriRAG <span className="hidden font-normal text-[#8e8e93] sm:inline">Evaluated Document Assistant</span>
           </h1>
         </div>
         <div className="flex items-center gap-4">
           <button
             onClick={activateGuestDemo}
             disabled={documents.length === 0 || querying}
-            className="inline-flex items-center gap-2 rounded-full bg-[#1d1d1f] px-5 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-full bg-[#1d1d1f] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-50 lg:px-5"
           >
-            <Sparkles className="h-4 w-4" />
-            Try Instant Guest Demo
+            <Sparkles className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">Try Instant Guest Demo</span>
+            <span className="sm:hidden">Guest Demo</span>
           </button>
         </div>
       </header>
 
-      {/* MAIN SPLIT-PANE WORKSPACE */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* MAIN SPLIT-PANE WORKSPACE (MOBILE FIX: flex-col lg:flex-row) */}
+      <div className="flex flex-1 flex-col overflow-hidden min-h-0 lg:flex-row">
         
-        {/* LEFT SIDEBAR: KNOWLEDGE BASE */}
-        <aside className="flex w-[340px] shrink-0 flex-col border-r border-black/5 bg-[#f5f5f7] shadow-[1px_0_10px_rgba(0,0,0,0.02)] lg:w-[420px]">
+        {/* LEFT SIDEBAR: KNOWLEDGE BASE (MOBILE FIX: w-full and h-[40vh]) */}
+        <aside className="z-10 flex h-[35vh] w-full shrink-0 flex-col border-b border-black/5 bg-[#f5f5f7] shadow-[0_1px_10px_rgba(0,0,0,0.02)] lg:h-auto lg:w-[420px] lg:border-b-0 lg:border-r lg:shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
           
           {/* Section 1: Upload */}
-          <div className="border-b border-black/5 p-6">
-            <h2 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8e8e93]">
+          <div className="border-b border-black/5 p-4 lg:p-6">
+            <h2 className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:text-xs">
               <Database className="h-4 w-4 text-[#007aff]" />
               Index a PDF Document
             </h2>
 
-            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#c7c7cc] bg-white p-6 transition-all hover:border-[#007aff] hover:bg-[#f0f9ff]">
+            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#c7c7cc] bg-white p-4 transition-all hover:border-[#007aff] hover:bg-[#f0f9ff] lg:p-6">
               {uploading ? (
                 <div className="flex flex-col items-center gap-3 text-[#007aff]">
                   <Loader2 className="h-6 w-6 animate-spin" />
@@ -178,60 +179,60 @@ export default function EvaluatedRagDashboard() {
                 </div>
               ) : (
                 <>
-                  <Upload className="mb-3 h-6 w-6 text-[#8e8e93]" />
-                  <span className="text-base font-semibold text-[#1d1d1f]">Upload PDF File</span>
-                  <span className="mt-1 text-xs font-medium text-[#8e8e93]">Max 15 MB</span>
+                  <Upload className="mb-2 h-5 w-5 text-[#8e8e93] lg:mb-3 lg:h-6 lg:w-6" />
+                  <span className="text-sm font-semibold text-[#1d1d1f] lg:text-base">Upload PDF File</span>
+                  <span className="mt-1 text-[11px] font-medium text-[#8e8e93] lg:text-xs">Max 15 MB</span>
                 </>
               )}
               <input type="file" accept=".pdf,application/pdf" onChange={handleFileUpload} disabled={uploading} className="hidden" />
             </label>
 
-            <label className="mt-4 flex cursor-pointer select-none items-center gap-2 text-sm font-medium text-[#8e8e93] transition hover:text-[#1d1d1f]">
+            <label className="mt-3 flex cursor-pointer select-none items-center gap-2 text-xs font-medium text-[#8e8e93] transition hover:text-[#1d1d1f] lg:text-sm">
               <input type="checkbox" checked={markAsDemo} onChange={(e) => setMarkAsDemo(e.target.checked)} className="h-4 w-4 rounded border-[#c7c7cc] text-[#007aff] focus:ring-[#007aff]" />
               Pin as pre-loaded Guest Demo
             </label>
           </div>
 
           {/* Section 2: Document List */}
-          <div className="flex flex-1 flex-col overflow-hidden p-6">
-            <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-[#8e8e93]">
+          <div className="flex flex-1 flex-col overflow-hidden p-4 lg:p-6">
+            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:text-xs">
               Active Documents ({documents.length})
             </h2>
 
             {loadingDocs ? (
               <div className="flex items-center gap-2 text-sm font-medium text-[#8e8e93]">
-                <Loader2 className="h-5 w-5 animate-spin" /> Syncing database...
+                <Loader2 className="h-5 w-5 animate-spin" /> Syncing...
               </div>
             ) : documents.length === 0 ? (
               <div className="rounded-xl border border-black/5 bg-white p-5 text-center text-sm font-medium text-[#8e8e93] shadow-sm">
                 No documents indexed. Upload a PDF to begin.
               </div>
             ) : (
-              <div className="custom-scrollbar flex-1 space-y-3 overflow-y-auto pr-3">
+              <div className="custom-scrollbar flex-1 space-y-3 overflow-y-auto pr-2 lg:pr-3">
                 {documents.map((doc) => {
                   const active = doc.id === selectedDocId;
                   return (
                     <div
                       key={doc.id}
                       onClick={() => { setSelectedDocId(doc.id); setResponse(null); }}
-                      className={`group flex cursor-pointer items-start justify-between gap-3 rounded-xl border p-4 transition-all ${
+                      className={`group flex cursor-pointer items-start justify-between gap-3 rounded-xl border p-3.5 transition-all lg:p-4 ${
                         active ? "border-[#007aff] bg-white shadow-[0_2px_12px_rgba(0,122,255,0.12)]" : "border-black/5 bg-white hover:border-[#c7c7cc]"
                       }`}
                     >
                       <div className="flex min-w-0 items-start gap-3">
-                        <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${active ? "bg-[#007aff]/10" : "bg-[#f2f2f7]"}`}>
-                          <FileText className={`h-5 w-5 ${active ? "text-[#007aff]" : "text-[#8e8e93]"}`} />
+                        <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg lg:h-8 lg:w-8 ${active ? "bg-[#007aff]/10" : "bg-[#f2f2f7]"}`}>
+                          <FileText className={`h-4 w-4 lg:h-5 lg:w-5 ${active ? "text-[#007aff]" : "text-[#8e8e93]"}`} />
                         </div>
                         <div className="min-w-0">
-                          <p className={`truncate text-base font-semibold ${active ? "text-[#1d1d1f]" : "text-[#1d1d1f]/80"}`}>{doc.title}</p>
-                          <div className="mt-1.5 flex items-center gap-2">
-                            <span className="text-xs font-medium text-[#8e8e93]">{doc.page_count} {doc.page_count === 1 ? "page" : "pages"}</span>
-                            {doc.is_demo && <span className="rounded bg-[#34c759]/10 px-2 py-0.5 text-[10px] font-bold text-[#34c759]">DEMO</span>}
+                          <p className={`truncate text-sm font-semibold lg:text-base ${active ? "text-[#1d1d1f]" : "text-[#1d1d1f]/80"}`}>{doc.title}</p>
+                          <div className="mt-1 flex items-center gap-2 lg:mt-1.5">
+                            <span className="text-[11px] font-medium text-[#8e8e93] lg:text-xs">{doc.page_count} {doc.page_count === 1 ? "page" : "pages"}</span>
+                            {doc.is_demo && <span className="rounded bg-[#34c759]/10 px-2 py-0.5 text-[9px] font-bold text-[#34c759] lg:text-[10px]">DEMO</span>}
                           </div>
                         </div>
                       </div>
-                      <button onClick={(e) => handleDeleteDoc(doc.id, e)} className="rounded p-1.5 text-[#8e8e93] opacity-0 transition-opacity hover:bg-[#ff3b30]/10 hover:text-[#ff3b30] group-hover:opacity-100">
-                        <Trash2 className="h-5 w-5" />
+                      <button onClick={(e) => handleDeleteDoc(doc.id, e)} className="rounded p-1.5 text-[#8e8e93] opacity-100 transition-opacity hover:bg-[#ff3b30]/10 hover:text-[#ff3b30] lg:opacity-0 lg:group-hover:opacity-100">
+                        <Trash2 className="h-4 w-4 lg:h-5 lg:w-5" />
                       </button>
                     </div>
                   );
@@ -241,105 +242,105 @@ export default function EvaluatedRagDashboard() {
           </div>
         </aside>
 
-        {/* RIGHT MAIN AREA (FLEX-COL SIBLINGS = IMPOSSIBLE TO OVERLAP) */}
-        <main className="flex min-w-0 flex-1 flex-col bg-white">
+        {/* RIGHT MAIN AREA */}
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-white relative">
           
-          {/* 1. SCROLLABLE RESULTS AREA (Takes up remaining vertical space) */}
-          <div className="custom-scrollbar flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-5xl space-y-8 p-6 lg:p-12">
+          {/* Scrollable Results Area */}
+          <div className="custom-scrollbar h-full w-full overflow-y-auto p-4 pb-48 lg:p-12 lg:pb-64">
+            <div className="mx-auto max-w-5xl space-y-6 lg:space-y-8">
               
               {errorMsg && (
-                <div className="flex items-center gap-3 rounded-xl border border-[#ff3b30]/20 bg-[#ff3b30]/5 p-5 text-base font-medium text-[#ff3b30]">
-                  <AlertTriangle className="h-6 w-6 shrink-0" />
+                <div className="flex items-center gap-3 rounded-xl border border-[#ff3b30]/20 bg-[#ff3b30]/5 p-4 text-sm font-medium text-[#ff3b30] lg:p-5 lg:text-base">
+                  <AlertTriangle className="h-5 w-5 shrink-0 lg:h-6 lg:w-6" />
                   {errorMsg}
                 </div>
               )}
 
               {!response && !querying && !errorMsg && (
-                <div className="flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-[#c7c7cc] bg-[#f5f5f7]/50 px-6 py-24 text-center">
-                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-black/5 bg-white shadow-sm">
-                    <ShieldCheck className="h-10 w-10 text-[#007aff]" />
+                <div className="flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-[#c7c7cc] bg-[#f5f5f7]/50 px-4 py-16 text-center lg:px-6 lg:py-24">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl border border-black/5 bg-white shadow-sm lg:mb-6 lg:h-20 lg:w-20">
+                    <ShieldCheck className="h-8 w-8 text-[#007aff] lg:h-10 lg:w-10" />
                   </div>
-                  <h3 className="text-2xl font-bold tracking-tight text-[#1d1d1f]">VeriRAG Engine Ready</h3>
-                  <p className="mt-3 max-w-lg text-base text-[#8e8e93]">
+                  <h3 className="text-xl font-bold tracking-tight text-[#1d1d1f] lg:text-2xl">VeriRAG Engine Ready</h3>
+                  <p className="mt-2 max-w-lg text-sm text-[#8e8e93] lg:mt-3 lg:text-base">
                     Select a document and ask a question below. The engine uses Hybrid Vector + RRF Search, generates inline citations, and audits every factual claim via NLI.
                   </p>
                 </div>
               )}
 
               {querying && (
-                <div className="flex flex-col items-center justify-center py-24 text-[#007aff]">
-                  <Loader2 className="mb-5 h-10 w-10 animate-spin" />
-                  <p className="text-base font-semibold">Retrieving context & auditing response...</p>
+                <div className="flex flex-col items-center justify-center py-16 text-[#007aff] lg:py-24">
+                  <Loader2 className="mb-4 h-8 w-8 animate-spin lg:mb-5 lg:h-10 lg:w-10" />
+                  <p className="text-sm font-semibold lg:text-base">Retrieving context & auditing response...</p>
                 </div>
               )}
 
               {response && !querying && (
-                <div className="duration-500 animate-in fade-in slide-in-from-bottom-4 space-y-8">
+                <div className="duration-500 animate-in fade-in slide-in-from-bottom-4 space-y-6 lg:space-y-8">
                   
                   {/* Apple Bento Box Metrics Row */}
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                    <div className={`flex flex-col justify-between rounded-[2rem] border border-black/5 p-6 shadow-sm ${scorePct >= 85 ? "bg-[#34c759]/5" : "bg-[#ff9500]/5"}`}>
-                      <div className="mb-4 flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#8e8e93]">Faithfulness Judge</span>
-                        {scorePct >= 85 ? <CheckCircle2 className="h-5 w-5 text-[#34c759]" /> : <AlertTriangle className="h-5 w-5 text-[#ff9500]" />}
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-5">
+                    <div className={`flex flex-col justify-between rounded-3xl border border-black/5 p-5 shadow-sm lg:rounded-[2rem] lg:p-6 ${scorePct >= 85 ? "bg-[#34c759]/5" : "bg-[#ff9500]/5"}`}>
+                      <div className="mb-3 flex items-center justify-between lg:mb-4">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:text-xs">Faithfulness Judge</span>
+                        {scorePct >= 85 ? <CheckCircle2 className="h-4 w-4 text-[#34c759] lg:h-5 lg:w-5" /> : <AlertTriangle className="h-4 w-4 text-[#ff9500] lg:h-5 lg:w-5" />}
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className={`text-5xl font-bold tracking-tighter ${scorePct >= 85 ? "text-[#34c759]" : "text-[#ff9500]"}`}>{scorePct}%</span>
+                        <span className={`text-4xl font-bold tracking-tighter lg:text-5xl ${scorePct >= 85 ? "text-[#34c759]" : "text-[#ff9500]"}`}>{scorePct}%</span>
                       </div>
-                      <p className="mt-2 text-sm font-medium text-[#8e8e93]">
+                      <p className="mt-1 text-xs font-medium text-[#8e8e93] lg:mt-2 lg:text-sm">
                         {response.evaluation.supported_claims} of {response.evaluation.total_claims} claims verified
                       </p>
                     </div>
 
-                    <div className="flex flex-col justify-between rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm">
-                      <div className="mb-4 flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#8e8e93]">Pipeline Latency</span>
-                        <Clock className="h-5 w-5 text-[#007aff]" />
+                    <div className="flex flex-col justify-between rounded-3xl border border-black/5 bg-white p-5 shadow-sm lg:rounded-[2rem] lg:p-6">
+                      <div className="mb-3 flex items-center justify-between lg:mb-4">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:text-xs">Pipeline Latency</span>
+                        <Clock className="h-4 w-4 text-[#007aff] lg:h-5 lg:w-5" />
                       </div>
-                      <p className="text-5xl font-bold tracking-tighter text-[#1d1d1f]">{(response.metrics.total_ms / 1000).toFixed(2)}s</p>
-                      <p className="mt-2 truncate text-sm font-medium text-[#8e8e93]">
+                      <p className="text-4xl font-bold tracking-tighter text-[#1d1d1f] lg:text-5xl">{(response.metrics.total_ms / 1000).toFixed(2)}s</p>
+                      <p className="mt-1 truncate text-xs font-medium text-[#8e8e93] lg:mt-2 lg:text-sm">
                         Search: {response.metrics.retrieval_ms}ms • Gen: {response.metrics.generation_ms}ms
                       </p>
                     </div>
 
-                    <div className="flex flex-col justify-between rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm">
-                      <div className="mb-4 flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#8e8e93]">Grounding Status</span>
-                        <Info className="h-5 w-5 text-[#1d1d1f]/40" />
+                    <div className="flex flex-col justify-between rounded-3xl border border-black/5 bg-white p-5 shadow-sm lg:rounded-[2rem] lg:p-6">
+                      <div className="mb-3 flex items-center justify-between lg:mb-4">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:text-xs">Grounding Status</span>
+                        <Info className="h-4 w-4 text-[#1d1d1f]/40 lg:h-5 lg:w-5" />
                       </div>
-                      <p className={`text-2xl font-bold tracking-tight ${response.is_answerable ? "text-[#1d1d1f]" : "text-[#ff9500]"}`}>
+                      <p className={`text-xl font-bold tracking-tight lg:text-2xl ${response.is_answerable ? "text-[#1d1d1f]" : "text-[#ff9500]"}`}>
                         {response.is_answerable ? "Grounded in Context" : "Safe Refusal (Out of Scope)"}
                       </p>
-                      <p className="mt-2 truncate text-sm font-medium text-[#8e8e93]">{response.metrics.model_used}</p>
+                      <p className="mt-1 truncate text-xs font-medium text-[#8e8e93] lg:mt-2 lg:text-sm">{response.metrics.model_used}</p>
                     </div>
                   </div>
 
                   {/* Main Answer Card */}
-                  <div className="rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm sm:p-10">
-                    <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-[#007aff]">Verified Answer</h3>
-                    <div className="prose prose-base max-w-none whitespace-pre-line font-medium leading-relaxed text-[#1d1d1f] md:prose-lg">
+                  <div className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm sm:p-10 lg:rounded-[2rem] lg:p-8">
+                    <h3 className="mb-4 text-[11px] font-bold uppercase tracking-wider text-[#007aff] lg:mb-5 lg:text-xs">Verified Answer</h3>
+                    <div className="prose prose-sm max-w-none whitespace-pre-line font-medium leading-relaxed text-[#1d1d1f] md:prose-base lg:prose-lg">
                       {response.answer}
                     </div>
-                    <div className="mt-8 rounded-xl bg-[#f5f5f7] p-5 text-base font-semibold text-[#1d1d1f]">
+                    <div className="mt-6 rounded-xl bg-[#f5f5f7] p-4 text-sm font-semibold text-[#1d1d1f] lg:mt-8 lg:p-5 lg:text-base">
                       <span className="mr-2 text-[#8e8e93]">Audit Verdict:</span> {response.evaluation.verdict}
                     </div>
                   </div>
 
                   {/* Inline Citations */}
                   {response.citations.length > 0 && (
-                    <div className="rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm">
-                      <h3 className="mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8e8e93]">
-                        <BookOpen className="h-5 w-5 text-[#007aff]" /> Supporting Evidence Citations
+                    <div className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm lg:rounded-[2rem] lg:p-8">
+                      <h3 className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:mb-5 lg:text-xs">
+                        <BookOpen className="h-4 w-4 text-[#007aff] lg:h-5 lg:w-5" /> Supporting Evidence Citations
                       </h3>
-                      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5">
                         {response.citations.map((cit, i) => (
-                          <div key={i} className="rounded-xl border border-black/5 bg-[#f9f9f9] p-5">
-                            <div className="mb-3 flex items-center justify-between">
-                              <span className="rounded-md bg-[#007aff]/10 px-2.5 py-1 text-xs font-bold text-[#007aff]">PAGE {cit.page_number}</span>
-                              <span className="text-xs font-bold text-[#8e8e93]">CHUNK #{cit.chunk_index}</span>
+                          <div key={i} className="rounded-xl border border-black/5 bg-[#f9f9f9] p-4 lg:p-5">
+                            <div className="mb-2 flex items-center justify-between lg:mb-3">
+                              <span className="rounded-md bg-[#007aff]/10 px-2 py-1 text-[10px] font-bold text-[#007aff] lg:px-2.5 lg:text-xs">PAGE {cit.page_number}</span>
+                              <span className="text-[10px] font-bold text-[#8e8e93] lg:text-xs">CHUNK #{cit.chunk_index}</span>
                             </div>
-                            <p className="text-base font-medium italic leading-relaxed text-[#1d1d1f]/80">&ldquo;{cit.quote}&rdquo;</p>
+                            <p className="text-sm font-medium italic leading-relaxed text-[#1d1d1f]/80 lg:text-base">&ldquo;{cit.quote}&rdquo;</p>
                           </div>
                         ))}
                       </div>
@@ -347,23 +348,23 @@ export default function EvaluatedRagDashboard() {
                   )}
 
                   {/* Raw Hybrid Search Chunks */}
-                  <div className="overflow-hidden rounded-[2rem] border border-black/5 bg-white shadow-sm">
+                  <div className="overflow-hidden rounded-3xl border border-black/5 bg-white shadow-sm lg:rounded-[2rem]">
                     <button
                       onClick={() => setShowRawChunks(!showRawChunks)}
-                      className="flex w-full items-center justify-between bg-white px-8 py-5 text-base font-bold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
+                      className="flex w-full items-center justify-between bg-white px-6 py-4 text-sm font-bold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7] lg:px-8 lg:py-5 lg:text-base"
                     >
-                      <span>Inspect Top-{response.retrieved_chunks.length} Hybrid Search Chunks (Vector + RRF)</span>
-                      {showRawChunks ? <ChevronUp className="h-6 w-6 text-[#8e8e93]" /> : <ChevronDown className="h-6 w-6 text-[#8e8e93]" />}
+                      <span className="text-left">Inspect Top-{response.retrieved_chunks.length} Search Chunks (Vector + RRF)</span>
+                      {showRawChunks ? <ChevronUp className="h-5 w-5 shrink-0 text-[#8e8e93] lg:h-6 lg:w-6" /> : <ChevronDown className="h-5 w-5 shrink-0 text-[#8e8e93] lg:h-6 lg:w-6" />}
                     </button>
                     {showRawChunks && (
-                      <div className="space-y-5 border-t border-black/5 bg-[#f9f9f9] p-8">
+                      <div className="space-y-4 border-t border-black/5 bg-[#f9f9f9] p-6 lg:space-y-5 lg:p-8">
                         {response.retrieved_chunks.map((chunk) => (
-                          <div key={chunk.chunk_id} className="rounded-xl border border-black/5 bg-white p-5">
-                            <div className="mb-3 flex items-center justify-between">
-                              <span className="text-sm font-bold text-[#1d1d1f]">Page {chunk.page_number} <span className="font-normal text-[#8e8e93]">/ Chunk #{chunk.chunk_index}</span></span>
-                              <span className="font-mono text-sm font-bold text-[#34c759]">RRF: {chunk.rrf_score.toFixed(4)}</span>
+                          <div key={chunk.chunk_id} className="rounded-xl border border-black/5 bg-white p-4 lg:p-5">
+                            <div className="mb-2 flex items-center justify-between lg:mb-3">
+                              <span className="text-xs font-bold text-[#1d1d1f] lg:text-sm">Page {chunk.page_number} <span className="font-normal text-[#8e8e93]">/ Chunk #{chunk.chunk_index}</span></span>
+                              <span className="font-mono text-xs font-bold text-[#34c759] lg:text-sm">RRF: {chunk.rrf_score.toFixed(4)}</span>
                             </div>
-                            <p className="whitespace-pre-line text-base font-medium leading-relaxed text-[#1d1d1f]/80">{chunk.content}</p>
+                            <p className="whitespace-pre-line text-sm font-medium leading-relaxed text-[#1d1d1f]/80 lg:text-base">{chunk.content}</p>
                           </div>
                         ))}
                       </div>
@@ -375,18 +376,18 @@ export default function EvaluatedRagDashboard() {
             </div>
           </div>
 
-          {/* 2. STATIC COMMAND BAR (Anchored at bottom, never overlaps) */}
-          <div className="shrink-0 border-t border-black/5 bg-white p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] lg:p-8">
+          {/* FLOATING COMMAND BAR */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/5 bg-white/90 p-4 backdrop-blur-2xl lg:left-[420px] lg:p-8">
             <div className="mx-auto max-w-5xl">
               
               {/* Sample Prompts */}
-              <div className="mb-4 hidden flex-wrap gap-3 md:flex">
+              <div className="mb-3 hidden flex-wrap gap-2 md:flex lg:mb-4 lg:gap-3">
                 {SAMPLE_PROMPTS.map((sample, idx) => (
                   <button
                     key={idx}
                     disabled={!selectedDocId || querying}
                     onClick={() => handleAsk(sample)}
-                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold text-[#8e8e93] shadow-sm transition-all hover:border-[#007aff] hover:text-[#007aff] disabled:pointer-events-none disabled:opacity-40"
+                    className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-semibold text-[#8e8e93] shadow-sm transition-all hover:border-[#007aff] hover:text-[#007aff] disabled:pointer-events-none disabled:opacity-40 lg:px-4 lg:py-2 lg:text-xs"
                   >
                     {sample}
                   </button>
@@ -399,17 +400,17 @@ export default function EvaluatedRagDashboard() {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={selectedDoc ? `Ask about "${selectedDoc.title}"...` : "Select a document first..."}
+                  placeholder={selectedDoc ? `Ask about "${selectedDoc.title}"...` : "Select a document..."}
                   disabled={!selectedDocId || querying}
-                  className="h-16 w-full rounded-2xl border-2 border-transparent bg-[#f5f5f7] pl-6 pr-36 text-lg font-semibold text-[#1d1d1f] shadow-inner transition-all placeholder:text-[#8e8e93] focus:border-[#007aff] focus:bg-white focus:outline-none disabled:opacity-60"
+                  className="h-14 w-full rounded-2xl border-2 border-transparent bg-[#f5f5f7] pl-5 pr-28 text-base font-semibold text-[#1d1d1f] shadow-inner transition-all placeholder:text-[#8e8e93] focus:border-[#007aff] focus:bg-white focus:outline-none disabled:opacity-60 lg:h-16 lg:pl-6 lg:pr-36 lg:text-lg"
                 />
-                <div className="absolute right-3">
+                <div className="absolute right-2 lg:right-3">
                   <button
                     type="submit"
                     disabled={!selectedDocId || !query.trim() || querying}
-                    className="flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#007aff] px-6 text-base font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                    className="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#007aff] px-4 text-sm font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40 lg:h-12 lg:gap-2.5 lg:px-6 lg:text-base"
                   >
-                    {querying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                    {querying ? <Loader2 className="h-4 w-4 animate-spin lg:h-5 lg:w-5" /> : <Send className="h-4 w-4 lg:h-5 lg:w-5" />}
                     <span className="hidden sm:inline">{querying ? "Auditing" : "Ask"}</span>
                   </button>
                 </div>
@@ -417,14 +418,13 @@ export default function EvaluatedRagDashboard() {
 
             </div>
           </div>
-
         </main>
       </div>
       
       <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #c7c7cc; }
       `}} />
     </div>
