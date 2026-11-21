@@ -157,7 +157,7 @@ export default function EvaluatedRagDashboard() {
       </header>
 
       {/* MAIN SPLIT-PANE WORKSPACE */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         
         {/* LEFT SIDEBAR: KNOWLEDGE BASE */}
         <aside className="flex w-[340px] lg:w-[420px] flex-col border-r border-black/5 bg-[#f5f5f7] shrink-0 z-10 shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
@@ -241,10 +241,10 @@ export default function EvaluatedRagDashboard() {
         </aside>
 
         {/* RIGHT MAIN AREA: QUERY & RESULTS */}
-        <main className="flex flex-1 flex-col bg-white relative">
+        <main className="flex flex-1 flex-col bg-white relative min-w-0 min-h-0 overflow-hidden">
           
           {/* Scrollable Results Area */}
-          <div className="custom-scrollbar flex-1 overflow-y-auto p-6 lg:p-12 pb-40">
+          <div className="custom-scrollbar h-full w-full overflow-y-auto p-6 lg:p-12 pb-64">
             <div className="mx-auto max-w-5xl space-y-8">
               
               {errorMsg && (
