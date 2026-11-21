@@ -134,11 +134,11 @@ export default function EvaluatedRagDashboard() {
   const scorePct = response ? Math.round(response.evaluation.faithfulness_score * 100) : 0;
 
   return (
-    // STRICT EDGE-TO-EDGE LOCK
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white">
+    // HYBRID WRAPPER: Normal scroll on Mobile, Locked Edge-to-Edge on Desktop (lg:)
+    <div className="flex min-h-screen flex-col bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white lg:h-screen lg:overflow-hidden">
       
-      {/* COMPACT TOP NAVIGATION BAR */}
-      <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7] px-4 lg:px-6">
+      {/* TOP NAVIGATION BAR: Sticky on Mobile, Static on Desktop */}
+      <header className="sticky top-0 z-50 flex h-[60px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7]/95 px-4 backdrop-blur-md lg:static lg:bg-[#f5f5f7] lg:px-6">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 shrink-0 text-[#007aff]" />
           <h1 className="text-base font-semibold tracking-wide text-[#1d1d1f]">
@@ -158,14 +158,14 @@ export default function EvaluatedRagDashboard() {
         </div>
       </header>
 
-      {/* MAIN SPLIT-PANE WORKSPACE (MOBILE FIX: flex-col lg:flex-row) */}
-      <div className="flex flex-1 flex-col overflow-hidden min-h-0 lg:flex-row">
+      {/* MAIN SPLIT-PANE WORKSPACE */}
+      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
         
-        {/* LEFT SIDEBAR: KNOWLEDGE BASE (MOBILE FIX: w-full and h-[40vh]) */}
-        <aside className="z-10 flex h-[35vh] w-full shrink-0 flex-col border-b border-black/5 bg-[#f5f5f7] shadow-[0_1px_10px_rgba(0,0,0,0.02)] lg:h-auto lg:w-[420px] lg:border-b-0 lg:border-r lg:shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
+        {/* LEFT SIDEBAR: KNOWLEDGE BASE */}
+        <aside className="flex flex-col border-b border-black/5 bg-[#f5f5f7] shadow-[0_1px_10px_rgba(0,0,0,0.02)] lg:w-[420px] lg:shrink-0 lg:border-b-0 lg:border-r lg:shadow-[1px_0_10px_rgba(0,0,0,0.02)] lg:overflow-hidden">
           
           {/* Section 1: Upload */}
-          <div className="border-b border-black/5 p-4 lg:p-6">
+          <div className="border-b border-black/5 p-4 lg:p-6 lg:shrink-0">
             <h2 className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:text-xs">
               <Database className="h-4 w-4 text-[#007aff]" />
               Index a PDF Document
@@ -194,7 +194,7 @@ export default function EvaluatedRagDashboard() {
           </div>
 
           {/* Section 2: Document List */}
-          <div className="flex flex-1 flex-col overflow-hidden p-4 lg:p-6">
+          <div className="flex flex-col p-4 lg:flex-1 lg:overflow-hidden lg:p-6">
             <h2 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-[#8e8e93] lg:text-xs">
               Active Documents ({documents.length})
             </h2>
@@ -208,7 +208,8 @@ export default function EvaluatedRagDashboard() {
                 No documents indexed. Upload a PDF to begin.
               </div>
             ) : (
-              <div className="custom-scrollbar flex-1 space-y-3 overflow-y-auto pr-2 lg:pr-3">
+              // MOBILE FIX: max-h-[30vh] limits list height on phones, while lg:max-h-none fills sidebar on desktop
+              <div className="custom-scrollbar space-y-3 overflow-y-auto pr-2 max-h-[30vh] lg:max-h-none lg:flex-1 lg:pr-3">
                 {documents.map((doc) => {
                   const active = doc.id === selectedDocId;
                   return (
@@ -243,11 +244,11 @@ export default function EvaluatedRagDashboard() {
         </aside>
 
         {/* RIGHT MAIN AREA */}
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-white relative">
+        <main className="relative flex flex-1 flex-col bg-white min-w-0 lg:overflow-hidden">
           
           {/* Scrollable Results Area */}
-          <div className="custom-scrollbar h-full w-full overflow-y-auto p-4 pb-48 lg:p-12 lg:pb-64">
-            <div className="mx-auto max-w-5xl space-y-6 lg:space-y-8">
+          <div className="custom-scrollbar flex-1 p-4 pb-32 lg:overflow-y-auto lg:p-12 lg:pb-48">
+            <div className="mx-auto w-full max-w-5xl space-y-6 lg:space-y-8">
               
               {errorMsg && (
                 <div className="flex items-center gap-3 rounded-xl border border-[#ff3b30]/20 bg-[#ff3b30]/5 p-4 text-sm font-medium text-[#ff3b30] lg:p-5 lg:text-base">
@@ -377,7 +378,8 @@ export default function EvaluatedRagDashboard() {
           </div>
 
           {/* FLOATING COMMAND BAR */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/5 bg-white/90 p-4 backdrop-blur-2xl lg:left-[420px] lg:p-8">
+          {/* MOBILE FIX: fixed to bottom of screen, Desktop lg:absolute to bottom of workspace */}
+          <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-black/5 bg-white/90 p-4 backdrop-blur-2xl lg:absolute lg:p-8">
             <div className="mx-auto max-w-5xl">
               
               {/* Sample Prompts */}
