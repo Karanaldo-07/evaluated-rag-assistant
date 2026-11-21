@@ -15,6 +15,8 @@ import {
   Trash2,
   Loader2,
   Database,
+  CheckCircle2,
+  Info,
 } from "lucide-react";
 import {
   DocumentItem,
@@ -132,133 +134,104 @@ export default function EvaluatedRagDashboard() {
   const scorePct = response ? Math.round(response.evaluation.faithfulness_score * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* Top Navbar */}
-      <header className="border-b border-slate-800 bg-slate-900/70 backdrop-blur px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    // FULL EDGE-TO-EDGE DESKTOP APP WRAPPER
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white">
+      
+      {/* COMPACT TOP NAVIGATION BAR */}
+      <header className="flex h-[52px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7] px-4 lg:px-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight">
-              VeriRAG <span className="text-indigo-400">• Evaluated Document Assistant</span>
-            </h1>
-            <p className="text-xs text-slate-400">
-              Hybrid Search (pgvector + RRF) • Structured Citations • Live NLI Faithfulness Judge
-            </p>
-          </div>
+          <ShieldCheck className="h-5 w-5 text-[#007aff]" />
+          <h1 className="text-sm font-semibold tracking-wide text-[#1d1d1f]">
+            VeriRAG <span className="font-normal text-[#8e8e93]">Evaluated Document Assistant</span>
+          </h1>
         </div>
-
-        <button
-          onClick={activateGuestDemo}
-          disabled={documents.length === 0 || querying}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-sm font-medium text-white transition cursor-pointer"
-        >
-          <Sparkles className="w-4 h-4" />
-          Try Instant Guest Demo
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={activateGuestDemo}
+            disabled={documents.length === 0 || querying}
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#1d1d1f] px-4 py-1.5 text-xs font-semibold text-white transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-50 shadow-sm"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Try Instant Guest Demo
+          </button>
+        </div>
       </header>
 
-      {/* Main Split Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 max-w-7xl w-full mx-auto">
-        {/* Left Sidebar: Document Knowledge Base */}
-        <aside className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-slate-800 p-5 flex flex-col gap-5 bg-slate-900/30">
-          <div>
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-              <Database className="w-4 h-4 text-indigo-400" />
-              1. Index a PDF Document
+      {/* MAIN SPLIT-PANE WORKSPACE */}
+      <div className="flex flex-1 overflow-hidden">
+        
+        {/* LEFT SIDEBAR: KNOWLEDGE BASE */}
+        <aside className="flex w-[320px] lg:w-[380px] flex-col border-r border-black/5 bg-[#f5f5f7] shrink-0 z-10 shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
+          
+          {/* Section 1: Upload */}
+          <div className="p-5 border-b border-black/5">
+            <h2 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#8e8e93]">
+              <Database className="h-3.5 w-3.5 text-[#007aff]" />
+              Index a PDF Document
             </h2>
 
-            <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-xl p-5 cursor-pointer transition bg-slate-900/60">
+            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#c7c7cc] bg-white p-5 transition-all hover:border-[#007aff] hover:bg-[#f0f9ff]">
               {uploading ? (
-                <div className="flex flex-col items-center gap-2 text-indigo-400">
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  <span className="text-xs font-medium">Chunking & generating embeddings...</span>
+                <div className="flex flex-col items-center gap-2 text-[#007aff]">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span className="text-xs font-medium">Generating embeddings...</span>
                 </div>
               ) : (
                 <>
-                  <Upload className="w-6 h-6 text-slate-400 mb-2" />
-                  <span className="text-sm font-medium text-slate-200">Upload PDF (max 15 MB)</span>
-                  <span className="text-xs text-slate-500 mt-1">Selectable text PDFs supported</span>
+                  <Upload className="mb-2 h-5 w-5 text-[#8e8e93]" />
+                  <span className="text-sm font-medium text-[#1d1d1f]">Upload PDF File</span>
+                  <span className="mt-1 text-[11px] text-[#8e8e93]">Max 15 MB</span>
                 </>
               )}
-              <input
-                type="file"
-                accept=".pdf,application/pdf"
-                onChange={handleFileUpload}
-                disabled={uploading}
-                className="hidden"
-              />
+              <input type="file" accept=".pdf,application/pdf" onChange={handleFileUpload} disabled={uploading} className="hidden" />
             </label>
 
-            <label className="mt-2.5 flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={markAsDemo}
-                onChange={(e) => setMarkAsDemo(e.target.checked)}
-                className="rounded border-slate-700 bg-slate-800 text-indigo-500"
-              />
-              Pin as pre-loaded Demo Document for guests
+            <label className="mt-3 flex cursor-pointer select-none items-center gap-2 text-xs font-medium text-[#8e8e93] transition hover:text-[#1d1d1f]">
+              <input type="checkbox" checked={markAsDemo} onChange={(e) => setMarkAsDemo(e.target.checked)} className="rounded border-[#c7c7cc] text-[#007aff] focus:ring-[#007aff]" />
+              Pin as pre-loaded Guest Demo
             </label>
           </div>
 
-          <div className="flex-1 flex flex-col min-h-0">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-              2. Select Active Document ({documents.length})
+          {/* Section 2: Document List */}
+          <div className="flex flex-1 flex-col overflow-hidden p-5">
+            <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#8e8e93]">
+              Active Documents ({documents.length})
             </h2>
 
             {loadingDocs ? (
-              <div className="text-xs text-slate-400 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" /> Loading indexed documents...
+              <div className="flex items-center gap-2 text-xs text-[#8e8e93]">
+                <Loader2 className="h-4 w-4 animate-spin" /> Syncing database...
               </div>
             ) : documents.length === 0 ? (
-              <div className="text-xs text-slate-500 bg-slate-900 border border-slate-800 rounded-lg p-4">
-                No documents indexed yet. Upload a PDF above to begin.
+              <div className="rounded-xl border border-black/5 bg-white p-4 text-center text-xs text-[#8e8e93] shadow-sm">
+                No documents indexed. Upload a PDF to begin.
               </div>
             ) : (
-              <div className="space-y-2 overflow-y-auto pr-1">
+              <div className="custom-scrollbar flex-1 space-y-2 overflow-y-auto pr-2">
                 {documents.map((doc) => {
                   const active = doc.id === selectedDocId;
                   return (
                     <div
                       key={doc.id}
-                      onClick={() => {
-                        setSelectedDocId(doc.id);
-                        setResponse(null);
-                      }}
-                      className={`p-3 rounded-xl border transition cursor-pointer flex items-start justify-between gap-2 ${
-                        active
-                          ? "bg-indigo-600/15 border-indigo-500 text-white"
-                          : "bg-slate-900/70 border-slate-800 text-slate-300 hover:border-slate-700"
+                      onClick={() => { setSelectedDocId(doc.id); setResponse(null); }}
+                      className={`group flex cursor-pointer items-start justify-between gap-2 rounded-xl border p-3.5 transition-all ${
+                        active ? "border-[#007aff] bg-white shadow-[0_2px_10px_rgba(0,122,255,0.1)]" : "border-black/5 bg-white hover:border-[#c7c7cc]"
                       }`}
                     >
-                      <div className="flex items-start gap-2.5 min-w-0">
-                        <FileText
-                          className={`w-4 h-4 mt-0.5 shrink-0 ${
-                            active ? "text-indigo-400" : "text-slate-500"
-                          }`}
-                        />
+                      <div className="flex min-w-0 items-start gap-3">
+                        <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${active ? "bg-[#007aff]/10" : "bg-[#f2f2f7]"}`}>
+                          <FileText className={`h-4 w-4 ${active ? "text-[#007aff]" : "text-[#8e8e93]"}`} />
+                        </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium truncate">{doc.title}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[11px] text-slate-400">
-                              {doc.page_count} {doc.page_count === 1 ? "page" : "pages"}
-                            </span>
-                            {doc.is_demo && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium">
-                                DEMO
-                              </span>
-                            )}
+                          <p className={`truncate text-sm font-semibold ${active ? "text-[#1d1d1f]" : "text-[#1d1d1f]/80"}`}>{doc.title}</p>
+                          <div className="mt-1 flex items-center gap-2">
+                            <span className="text-[11px] font-medium text-[#8e8e93]">{doc.page_count} {doc.page_count === 1 ? "page" : "pages"}</span>
+                            {doc.is_demo && <span className="rounded bg-[#34c759]/10 px-1.5 py-0.5 text-[9px] font-bold text-[#34c759]">DEMO</span>}
                           </div>
                         </div>
                       </div>
-
-                      <button
-                        onClick={(e) => handleDeleteDoc(doc.id, e)}
-                        title="Delete document"
-                        className="text-slate-500 hover:text-rose-400 p-1 rounded transition cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
+                      <button onClick={(e) => handleDeleteDoc(doc.id, e)} className="rounded p-1.5 text-[#8e8e93] opacity-0 transition-opacity hover:bg-[#ff3b30]/10 hover:text-[#ff3b30] group-hover:opacity-100">
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   );
@@ -268,227 +241,191 @@ export default function EvaluatedRagDashboard() {
           </div>
         </aside>
 
-        {/* Right Main Workspace: Query, Grounded Answer, Faithfulness Audit & Citations */}
-        <main className="lg:col-span-8 p-6 flex flex-col gap-6">
-          {errorMsg && (
-            <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-200 text-sm flex items-center gap-2.5">
-              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          {/* Query Box */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-slate-400">
-                Active Context:{" "}
-                <strong className="text-slate-200">
-                  {selectedDoc ? selectedDoc.title : "None selected"}
-                </strong>
-              </span>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleAsk();
-              }}
-              className="flex gap-2"
-            >
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ask a factual question grounded in the selected PDF..."
-                disabled={!selectedDocId || querying}
-                className="flex-1 bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500"
-              />
-              <button
-                type="submit"
-                disabled={!selectedDocId || !query.trim() || querying}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-sm font-medium text-white inline-flex items-center gap-2 transition cursor-pointer"
-              >
-                {querying ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Auditing...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" /> Ask
-                  </>
-                )}
-              </button>
-            </form>
-
-            {/* Quick Test Prompts */}
-            <div className="mt-3 flex flex-wrap gap-2">
-              {SAMPLE_PROMPTS.map((sample, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  disabled={!selectedDocId || querying}
-                  onClick={() => handleAsk(sample)}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-800 text-slate-300 border border-slate-700/70 transition text-left cursor-pointer disabled:opacity-40"
-                >
-                  {sample}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Results Area */}
-          {response ? (
-            <div className="space-y-5">
-              {/* Telemetry & Faithfulness Audit Banner */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div
-                  className={`p-4 rounded-xl border ${
-                    scorePct >= 85
-                      ? "bg-emerald-950/30 border-emerald-500/40"
-                      : "bg-amber-950/30 border-amber-500/40"
-                  }`}
-                >
-                  <div className="text-xs text-slate-400">Faithfulness Score (NLI Judge)</div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span
-                      className={`text-2xl font-bold ${
-                        scorePct >= 85 ? "text-emerald-400" : "text-amber-400"
-                      }`}
-                    >
-                      {scorePct}%
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      ({response.evaluation.supported_claims}/{response.evaluation.total_claims}{" "}
-                      claims verified)
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-                  <div className="text-xs text-slate-400 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-indigo-400" /> Pipeline Latency
-                  </div>
-                  <div className="mt-1 text-lg font-semibold text-slate-100">
-                    {(response.metrics.total_ms / 1000).toFixed(2)}s{" "}
-                    <span className="text-xs font-normal text-slate-400">total</span>
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
-                    Search {response.metrics.retrieval_ms}ms • Gen {response.metrics.generation_ms}ms
-                    • Audit {response.metrics.evaluation_ms}ms
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-                  <div className="text-xs text-slate-400">Grounding Status</div>
-                  <div className="mt-1 text-sm font-semibold">
-                    {response.is_answerable ? (
-                      <span className="text-indigo-400">Grounded in Document</span>
-                    ) : (
-                      <span className="text-amber-400">Safe Refusal (Out of Scope)</span>
-                    )}
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5 truncate">
-                    {response.metrics.model_used}
-                  </div>
-                </div>
-              </div>
-
-              {/* Generated Answer Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-2">
-                  Verified Answer
-                </h3>
-                <p className="text-sm leading-relaxed text-slate-100 whitespace-pre-line">
-                  {response.answer}
-                </p>
-                <div className="mt-4 pt-3 border-t border-slate-800/80 text-xs text-slate-400">
-                  <strong className="text-slate-300">Audit Verdict:</strong>{" "}
-                  {response.evaluation.verdict}
-                </div>
-              </div>
-
-              {/* Inline Citations List */}
-              {response.citations.length > 0 && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-indigo-400" />
-                    Supporting Evidence Citations ({response.citations.length})
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {response.citations.map((cit, i) => (
-                      <div
-                        key={i}
-                        className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs"
-                      >
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-medium">
-                            Page {cit.page_number}
-                          </span>
-                          <span className="text-slate-500">Chunk #{cit.chunk_index}</span>
-                        </div>
-                        <p className="text-slate-300 italic">&ldquo;{cit.quote}&rdquo;</p>
-                      </div>
-                    ))}
-                  </div>
+        {/* RIGHT MAIN AREA: QUERY & RESULTS */}
+        <main className="flex flex-1 flex-col bg-white relative">
+          
+          {/* Scrollable Results Area */}
+          <div className="custom-scrollbar flex-1 overflow-y-auto p-6 lg:p-10 pb-32">
+            <div className="mx-auto max-w-4xl space-y-6">
+              
+              {errorMsg && (
+                <div className="flex items-center gap-3 rounded-xl border border-[#ff3b30]/20 bg-[#ff3b30]/5 p-4 text-sm font-medium text-[#ff3b30]">
+                  <AlertTriangle className="h-5 w-5 shrink-0" />
+                  {errorMsg}
                 </div>
               )}
 
-              {/* Expandable Raw Hybrid Search Chunks */}
-              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setShowRawChunks(!showRawChunks)}
-                  className="w-full px-5 py-3.5 flex items-center justify-between text-xs font-medium text-slate-300 hover:bg-slate-900 transition cursor-pointer"
-                >
-                  <span>
-                    Inspect Top-{response.retrieved_chunks.length} Hybrid Search Chunks (Vector +
-                    Full-Text RRF Scores)
-                  </span>
-                  {showRawChunks ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
-                  )}
-                </button>
-
-                {showRawChunks && (
-                  <div className="p-5 pt-0 space-y-3 border-t border-slate-800/80">
-                    {response.retrieved_chunks.map((chunk) => (
-                      <div
-                        key={chunk.chunk_id}
-                        className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5"
-                      >
-                        <div className="flex items-center justify-between text-slate-400">
-                          <span>
-                            <strong>Page {chunk.page_number}</strong> • Chunk #{chunk.chunk_index}
-                          </span>
-                          <span className="font-mono text-emerald-400">
-                            RRF Score: {chunk.rrf_score}
-                          </span>
-                        </div>
-                        <p className="text-slate-300 whitespace-pre-line leading-relaxed">
-                          {chunk.content}
-                        </p>
-                      </div>
-                    ))}
+              {!response && !querying && !errorMsg && (
+                <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[#c7c7cc] bg-[#f5f5f7]/50 py-20 text-center px-4">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm border border-black/5">
+                    <ShieldCheck className="h-8 w-8 text-[#007aff]" />
                   </div>
-                )}
+                  <h3 className="text-lg font-semibold tracking-tight text-[#1d1d1f]">VeriRAG Engine Ready</h3>
+                  <p className="mt-2 max-w-md text-sm text-[#8e8e93]">
+                    Select a document and ask a question below. The engine uses Hybrid Vector + RRF Search, generates inline citations, and audits every factual claim via NLI.
+                  </p>
+                </div>
+              )}
+
+              {querying && (
+                <div className="flex flex-col items-center justify-center py-20 text-[#007aff]">
+                  <Loader2 className="mb-4 h-8 w-8 animate-spin" />
+                  <p className="text-sm font-semibold">Retrieving context & auditing response...</p>
+                </div>
+              )}
+
+              {response && !querying && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  
+                  {/* Apple Bento Box Metrics Row */}
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div className={`flex flex-col justify-between rounded-[1.5rem] border border-black/5 p-5 shadow-sm ${scorePct >= 85 ? "bg-[#34c759]/5" : "bg-[#ff9500]/5"}`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8e8e93]">Faithfulness Judge</span>
+                        {scorePct >= 85 ? <CheckCircle2 className="h-4 w-4 text-[#34c759]" /> : <AlertTriangle className="h-4 w-4 text-[#ff9500]" />}
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className={`text-4xl font-semibold tracking-tighter ${scorePct >= 85 ? "text-[#34c759]" : "text-[#ff9500]"}`}>{scorePct}%</span>
+                      </div>
+                      <p className="mt-1 text-xs font-medium text-[#8e8e93]">
+                        {response.evaluation.supported_claims} of {response.evaluation.total_claims} claims verified
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col justify-between rounded-[1.5rem] border border-black/5 bg-white p-5 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8e8e93]">Pipeline Latency</span>
+                        <Clock className="h-4 w-4 text-[#007aff]" />
+                      </div>
+                      <p className="text-4xl font-semibold tracking-tighter text-[#1d1d1f]">{(response.metrics.total_ms / 1000).toFixed(2)}s</p>
+                      <p className="mt-1 text-[11px] font-medium text-[#8e8e93] truncate">
+                        Search: {response.metrics.retrieval_ms}ms • Gen: {response.metrics.generation_ms}ms
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col justify-between rounded-[1.5rem] border border-black/5 bg-white p-5 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8e8e93]">Grounding Status</span>
+                        <Info className="h-4 w-4 text-[#1d1d1f]/40" />
+                      </div>
+                      <p className={`text-xl font-semibold tracking-tight ${response.is_answerable ? "text-[#1d1d1f]" : "text-[#ff9500]"}`}>
+                        {response.is_answerable ? "Grounded in Context" : "Safe Refusal (Out of Scope)"}
+                      </p>
+                      <p className="mt-1 text-xs font-medium text-[#8e8e93] truncate">{response.metrics.model_used}</p>
+                    </div>
+                  </div>
+
+                  {/* Main Answer Card */}
+                  <div className="rounded-[1.5rem] border border-black/5 bg-white p-6 shadow-sm sm:p-8">
+                    <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-[#007aff]">Verified Answer</h3>
+                    <div className="prose prose-sm md:prose-base max-w-none text-[#1d1d1f] leading-relaxed whitespace-pre-line">
+                      {response.answer}
+                    </div>
+                    <div className="mt-6 rounded-xl bg-[#f5f5f7] p-4 text-sm font-medium text-[#1d1d1f]">
+                      <span className="text-[#8e8e93]">Audit Verdict:</span> {response.evaluation.verdict}
+                    </div>
+                  </div>
+
+                  {/* Inline Citations */}
+                  {response.citations.length > 0 && (
+                    <div className="rounded-[1.5rem] border border-black/5 bg-white p-6 shadow-sm">
+                      <h3 className="mb-4 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#8e8e93]">
+                        <BookOpen className="h-4 w-4 text-[#007aff]" /> Supporting Evidence Citations
+                      </h3>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {response.citations.map((cit, i) => (
+                          <div key={i} className="rounded-xl border border-black/5 bg-[#f9f9f9] p-4">
+                            <div className="mb-2 flex items-center justify-between">
+                              <span className="rounded-md bg-[#007aff]/10 px-2 py-1 text-[10px] font-bold text-[#007aff]">PAGE {cit.page_number}</span>
+                              <span className="text-[10px] font-semibold text-[#8e8e93]">CHUNK #{cit.chunk_index}</span>
+                            </div>
+                            <p className="text-sm font-medium italic text-[#1d1d1f]/80 leading-relaxed">&ldquo;{cit.quote}&rdquo;</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Raw Hybrid Search Chunks */}
+                  <div className="rounded-[1.5rem] border border-black/5 bg-white shadow-sm overflow-hidden">
+                    <button
+                      onClick={() => setShowRawChunks(!showRawChunks)}
+                      className="flex w-full items-center justify-between bg-white px-6 py-4 text-sm font-semibold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
+                    >
+                      <span>Inspect Top-{response.retrieved_chunks.length} Hybrid Search Chunks (Vector + RRF)</span>
+                      {showRawChunks ? <ChevronUp className="h-5 w-5 text-[#8e8e93]" /> : <ChevronDown className="h-5 w-5 text-[#8e8e93]" />}
+                    </button>
+                    {showRawChunks && (
+                      <div className="border-t border-black/5 bg-[#f9f9f9] p-6 space-y-4">
+                        {response.retrieved_chunks.map((chunk) => (
+                          <div key={chunk.chunk_id} className="rounded-xl border border-black/5 bg-white p-4">
+                            <div className="mb-2 flex items-center justify-between">
+                              <span className="text-xs font-semibold text-[#1d1d1f]">Page {chunk.page_number} <span className="font-normal text-[#8e8e93]">/ Chunk #{chunk.chunk_index}</span></span>
+                              <span className="font-mono text-xs font-semibold text-[#34c759]">RRF: {chunk.rrf_score.toFixed(4)}</span>
+                            </div>
+                            <p className="text-sm text-[#1d1d1f]/80 leading-relaxed whitespace-pre-line">{chunk.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* FLOATING COMMAND BAR (Pinned to bottom of workspace) */}
+          <div className="absolute bottom-0 left-0 right-0 border-t border-black/5 bg-white/80 p-4 lg:p-6 backdrop-blur-xl">
+            <div className="mx-auto max-w-4xl">
+              
+              {/* Sample Prompts */}
+              <div className="mb-3 hidden flex-wrap gap-2 md:flex">
+                {SAMPLE_PROMPTS.map((sample, idx) => (
+                  <button
+                    key={idx}
+                    disabled={!selectedDocId || querying}
+                    onClick={() => handleAsk(sample)}
+                    className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-[#8e8e93] transition-all hover:border-[#007aff] hover:text-[#007aff] disabled:pointer-events-none disabled:opacity-40 shadow-sm"
+                  >
+                    {sample}
+                  </button>
+                ))}
               </div>
+
+              {/* Main Input Form */}
+              <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className="relative flex items-center shadow-lg rounded-2xl">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={selectedDoc ? `Ask about "${selectedDoc.title}"...` : "Select a document first..."}
+                  disabled={!selectedDocId || querying}
+                  className="h-14 w-full rounded-2xl border-2 border-transparent bg-[#f5f5f7] pl-5 pr-32 text-base font-medium text-[#1d1d1f] placeholder:text-[#8e8e93] focus:border-[#007aff] focus:bg-white focus:outline-none disabled:opacity-60 transition-all shadow-inner"
+                />
+                <div className="absolute right-2">
+                  <button
+                    type="submit"
+                    disabled={!selectedDocId || !query.trim() || querying}
+                    className="flex h-10 items-center justify-center gap-2 rounded-xl bg-[#007aff] px-5 text-sm font-semibold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                  >
+                    {querying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    <span className="hidden sm:inline">{querying ? "Auditing" : "Ask"}</span>
+                  </button>
+                </div>
+              </form>
+
             </div>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-10 border border-dashed border-slate-800 rounded-2xl text-slate-500">
-              <ShieldCheck className="w-10 h-10 text-slate-700 mb-3" />
-              <p className="text-sm font-medium text-slate-300">
-                Ask a question or click &ldquo;Try Instant Guest Demo&rdquo;
-              </p>
-              <p className="text-xs max-w-md mt-1">
-                Every response runs hybrid vector + keyword retrieval, generates inline page
-                citations, and audits every factual claim for faithfulness.
-              </p>
-            </div>
-          )}
+          </div>
         </main>
       </div>
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #c7c7cc; }
+      `}} />
     </div>
   );
 }
