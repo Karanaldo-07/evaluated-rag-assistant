@@ -134,10 +134,11 @@ export default function EvaluatedRagDashboard() {
   const scorePct = response ? Math.round(response.evaluation.faithfulness_score * 100) : 0;
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white">
+    // UNLOCKED LAYOUT: min-h-screen allows normal vertical page scrolling
+    <div className="flex min-h-screen flex-col bg-white font-sans text-[#1d1d1f] selection:bg-[#007aff] selection:text-white">
       
-      {/* COMPACT TOP NAVIGATION BAR */}
-      <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7] px-4 lg:px-6">
+      {/* STICKY TOP NAVIGATION BAR */}
+      <header className="sticky top-0 z-50 flex h-[60px] shrink-0 items-center justify-between border-b border-black/5 bg-[#f5f5f7]/90 px-4 backdrop-blur-md lg:px-6">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-[#007aff]" />
           <h1 className="text-base font-semibold tracking-wide text-[#1d1d1f]">
@@ -148,7 +149,7 @@ export default function EvaluatedRagDashboard() {
           <button
             onClick={activateGuestDemo}
             disabled={documents.length === 0 || querying}
-            className="inline-flex items-center gap-2 rounded-full bg-[#1d1d1f] px-5 py-2 text-sm font-semibold text-white transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-50 shadow-sm"
+            className="inline-flex items-center gap-2 rounded-full bg-[#1d1d1f] px-5 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
           >
             <Sparkles className="h-4 w-4" />
             Try Instant Guest Demo
@@ -156,14 +157,15 @@ export default function EvaluatedRagDashboard() {
         </div>
       </header>
 
-      {/* MAIN SPLIT-PANE WORKSPACE */}
-      <div className="flex flex-1 overflow-hidden min-h-0">
+      {/* MAIN WORKSPACE WRAPPER */}
+      <div className="flex flex-1 flex-col lg:flex-row">
         
-        {/* LEFT SIDEBAR: KNOWLEDGE BASE */}
-        <aside className="flex w-[340px] lg:w-[420px] flex-col border-r border-black/5 bg-[#f5f5f7] shrink-0 z-10 shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
+        {/* STICKY LEFT SIDEBAR */}
+        {/* On desktop, it sticks below the 60px header and spans the remaining viewport height */}
+        <aside className="z-40 flex w-full shrink-0 flex-col border-b border-black/5 bg-[#f5f5f7] lg:sticky lg:top-[60px] lg:h-[calc(100vh-60px)] lg:w-[420px] lg:border-b-0 lg:border-r shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
           
           {/* Section 1: Upload */}
-          <div className="p-6 border-b border-black/5">
+          <div className="border-b border-black/5 p-6">
             <h2 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8e8e93]">
               <Database className="h-4 w-4 text-[#007aff]" />
               Index a PDF Document
@@ -240,12 +242,11 @@ export default function EvaluatedRagDashboard() {
           </div>
         </aside>
 
-        {/* RIGHT MAIN AREA: QUERY & RESULTS */}
-        <main className="flex flex-1 flex-col bg-white relative min-w-0 min-h-0 overflow-hidden">
+        {/* RIGHT MAIN AREA (NATURAL SCROLL) */}
+        <main className="flex flex-1 flex-col bg-white">
           
-          {/* Scrollable Results Area */}
-          <div className="custom-scrollbar h-full w-full overflow-y-auto p-6 lg:p-12 pb-64">
-            <div className="mx-auto max-w-5xl space-y-8">
+          <div className="mx-auto w-full max-w-5xl p-6 pb-48 lg:p-12">
+            <div className="space-y-8">
               
               {errorMsg && (
                 <div className="flex items-center gap-3 rounded-xl border border-[#ff3b30]/20 bg-[#ff3b30]/5 p-5 text-base font-medium text-[#ff3b30]">
@@ -255,8 +256,8 @@ export default function EvaluatedRagDashboard() {
               )}
 
               {!response && !querying && !errorMsg && (
-                <div className="flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-[#c7c7cc] bg-[#f5f5f7]/50 py-24 text-center px-6">
-                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white shadow-sm border border-black/5">
+                <div className="flex flex-col items-center justify-center rounded-[2rem] border border-dashed border-[#c7c7cc] bg-[#f5f5f7]/50 px-6 py-24 text-center">
+                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-black/5 bg-white shadow-sm">
                     <ShieldCheck className="h-10 w-10 text-[#007aff]" />
                   </div>
                   <h3 className="text-2xl font-bold tracking-tight text-[#1d1d1f]">VeriRAG Engine Ready</h3>
@@ -274,12 +275,12 @@ export default function EvaluatedRagDashboard() {
               )}
 
               {response && !querying && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="duration-500 animate-in fade-in slide-in-from-bottom-4 space-y-8">
                   
                   {/* Apple Bento Box Metrics Row */}
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                     <div className={`flex flex-col justify-between rounded-[2rem] border border-black/5 p-6 shadow-sm ${scorePct >= 85 ? "bg-[#34c759]/5" : "bg-[#ff9500]/5"}`}>
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="mb-4 flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-[#8e8e93]">Faithfulness Judge</span>
                         {scorePct >= 85 ? <CheckCircle2 className="h-5 w-5 text-[#34c759]" /> : <AlertTriangle className="h-5 w-5 text-[#ff9500]" />}
                       </div>
@@ -292,36 +293,36 @@ export default function EvaluatedRagDashboard() {
                     </div>
 
                     <div className="flex flex-col justify-between rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm">
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="mb-4 flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-[#8e8e93]">Pipeline Latency</span>
                         <Clock className="h-5 w-5 text-[#007aff]" />
                       </div>
                       <p className="text-5xl font-bold tracking-tighter text-[#1d1d1f]">{(response.metrics.total_ms / 1000).toFixed(2)}s</p>
-                      <p className="mt-2 text-sm font-medium text-[#8e8e93] truncate">
+                      <p className="mt-2 truncate text-sm font-medium text-[#8e8e93]">
                         Search: {response.metrics.retrieval_ms}ms • Gen: {response.metrics.generation_ms}ms
                       </p>
                     </div>
 
                     <div className="flex flex-col justify-between rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm">
-                      <div className="flex items-center justify-between mb-4">
+                      <div className="mb-4 flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-[#8e8e93]">Grounding Status</span>
                         <Info className="h-5 w-5 text-[#1d1d1f]/40" />
                       </div>
                       <p className={`text-2xl font-bold tracking-tight ${response.is_answerable ? "text-[#1d1d1f]" : "text-[#ff9500]"}`}>
                         {response.is_answerable ? "Grounded in Context" : "Safe Refusal (Out of Scope)"}
                       </p>
-                      <p className="mt-2 text-sm font-medium text-[#8e8e93] truncate">{response.metrics.model_used}</p>
+                      <p className="mt-2 truncate text-sm font-medium text-[#8e8e93]">{response.metrics.model_used}</p>
                     </div>
                   </div>
 
                   {/* Main Answer Card */}
                   <div className="rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm sm:p-10">
                     <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-[#007aff]">Verified Answer</h3>
-                    <div className="prose prose-base md:prose-lg max-w-none text-[#1d1d1f] leading-relaxed whitespace-pre-line font-medium">
+                    <div className="prose prose-base max-w-none whitespace-pre-line font-medium leading-relaxed text-[#1d1d1f] md:prose-lg">
                       {response.answer}
                     </div>
                     <div className="mt-8 rounded-xl bg-[#f5f5f7] p-5 text-base font-semibold text-[#1d1d1f]">
-                      <span className="text-[#8e8e93] mr-2">Audit Verdict:</span> {response.evaluation.verdict}
+                      <span className="mr-2 text-[#8e8e93]">Audit Verdict:</span> {response.evaluation.verdict}
                     </div>
                   </div>
 
@@ -338,7 +339,7 @@ export default function EvaluatedRagDashboard() {
                               <span className="rounded-md bg-[#007aff]/10 px-2.5 py-1 text-xs font-bold text-[#007aff]">PAGE {cit.page_number}</span>
                               <span className="text-xs font-bold text-[#8e8e93]">CHUNK #{cit.chunk_index}</span>
                             </div>
-                            <p className="text-base font-medium italic text-[#1d1d1f]/80 leading-relaxed">&ldquo;{cit.quote}&rdquo;</p>
+                            <p className="text-base font-medium italic leading-relaxed text-[#1d1d1f]/80">&ldquo;{cit.quote}&rdquo;</p>
                           </div>
                         ))}
                       </div>
@@ -346,7 +347,7 @@ export default function EvaluatedRagDashboard() {
                   )}
 
                   {/* Raw Hybrid Search Chunks */}
-                  <div className="rounded-[2rem] border border-black/5 bg-white shadow-sm overflow-hidden">
+                  <div className="overflow-hidden rounded-[2rem] border border-black/5 bg-white shadow-sm">
                     <button
                       onClick={() => setShowRawChunks(!showRawChunks)}
                       className="flex w-full items-center justify-between bg-white px-8 py-5 text-base font-bold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
@@ -355,14 +356,14 @@ export default function EvaluatedRagDashboard() {
                       {showRawChunks ? <ChevronUp className="h-6 w-6 text-[#8e8e93]" /> : <ChevronDown className="h-6 w-6 text-[#8e8e93]" />}
                     </button>
                     {showRawChunks && (
-                      <div className="border-t border-black/5 bg-[#f9f9f9] p-8 space-y-5">
+                      <div className="space-y-5 border-t border-black/5 bg-[#f9f9f9] p-8">
                         {response.retrieved_chunks.map((chunk) => (
                           <div key={chunk.chunk_id} className="rounded-xl border border-black/5 bg-white p-5">
                             <div className="mb-3 flex items-center justify-between">
                               <span className="text-sm font-bold text-[#1d1d1f]">Page {chunk.page_number} <span className="font-normal text-[#8e8e93]">/ Chunk #{chunk.chunk_index}</span></span>
                               <span className="font-mono text-sm font-bold text-[#34c759]">RRF: {chunk.rrf_score.toFixed(4)}</span>
                             </div>
-                            <p className="text-base text-[#1d1d1f]/80 leading-relaxed whitespace-pre-line font-medium">{chunk.content}</p>
+                            <p className="whitespace-pre-line text-base font-medium leading-relaxed text-[#1d1d1f]/80">{chunk.content}</p>
                           </div>
                         ))}
                       </div>
@@ -373,52 +374,53 @@ export default function EvaluatedRagDashboard() {
               )}
             </div>
           </div>
-
-          {/* FLOATING COMMAND BAR */}
-          <div className="absolute bottom-0 left-0 right-0 border-t border-black/5 bg-white/90 p-5 lg:p-8 backdrop-blur-2xl">
-            <div className="mx-auto max-w-5xl">
-              
-              {/* Sample Prompts */}
-              <div className="mb-4 hidden flex-wrap gap-3 md:flex">
-                {SAMPLE_PROMPTS.map((sample, idx) => (
-                  <button
-                    key={idx}
-                    disabled={!selectedDocId || querying}
-                    onClick={() => handleAsk(sample)}
-                    className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold text-[#8e8e93] transition-all hover:border-[#007aff] hover:text-[#007aff] disabled:pointer-events-none disabled:opacity-40 shadow-sm"
-                  >
-                    {sample}
-                  </button>
-                ))}
-              </div>
-
-              {/* Main Input Form */}
-              <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className="relative flex items-center shadow-xl rounded-2xl">
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={selectedDoc ? `Ask about "${selectedDoc.title}"...` : "Select a document first..."}
-                  disabled={!selectedDocId || querying}
-                  className="h-16 w-full rounded-2xl border-2 border-transparent bg-[#f5f5f7] pl-6 pr-36 text-lg font-semibold text-[#1d1d1f] placeholder:text-[#8e8e93] focus:border-[#007aff] focus:bg-white focus:outline-none disabled:opacity-60 transition-all shadow-inner"
-                />
-                <div className="absolute right-3">
-                  <button
-                    type="submit"
-                    disabled={!selectedDocId || !query.trim() || querying}
-                    className="flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#007aff] px-6 text-base font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-                  >
-                    {querying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                    <span className="hidden sm:inline">{querying ? "Auditing" : "Ask"}</span>
-                  </button>
-                </div>
-              </form>
-
-            </div>
-          </div>
         </main>
       </div>
       
+      {/* FLOATING COMMAND BAR */}
+      {/* FIXED at the bottom, perfectly aligned over the main right area */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-black/5 bg-white/90 p-5 backdrop-blur-2xl lg:left-[420px] lg:p-8">
+        <div className="mx-auto max-w-5xl">
+          
+          {/* Sample Prompts */}
+          <div className="mb-4 hidden flex-wrap gap-3 md:flex">
+            {SAMPLE_PROMPTS.map((sample, idx) => (
+              <button
+                key={idx}
+                disabled={!selectedDocId || querying}
+                onClick={() => handleAsk(sample)}
+                className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold text-[#8e8e93] shadow-sm transition-all hover:border-[#007aff] hover:text-[#007aff] disabled:pointer-events-none disabled:opacity-40"
+              >
+                {sample}
+              </button>
+            ))}
+          </div>
+
+          {/* Main Input Form */}
+          <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className="relative flex items-center rounded-2xl shadow-xl">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={selectedDoc ? `Ask about "${selectedDoc.title}"...` : "Select a document first..."}
+              disabled={!selectedDocId || querying}
+              className="h-16 w-full rounded-2xl border-2 border-transparent bg-[#f5f5f7] pl-6 pr-36 text-lg font-semibold text-[#1d1d1f] shadow-inner transition-all placeholder:text-[#8e8e93] focus:border-[#007aff] focus:bg-white focus:outline-none disabled:opacity-60"
+            />
+            <div className="absolute right-3">
+              <button
+                type="submit"
+                disabled={!selectedDocId || !query.trim() || querying}
+                className="flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#007aff] px-6 text-base font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+              >
+                {querying ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                <span className="hidden sm:inline">{querying ? "Auditing" : "Ask"}</span>
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
